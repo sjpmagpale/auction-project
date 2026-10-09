@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * A simple model of an auction.
@@ -55,8 +56,8 @@ public class Auction
     {
         Lot selectedLot = getLot(lotNumber);
         if(selectedLot != null) {
-            Bid aBid = new Bid(bidder, value);
-            boolean successful = selectedLot.bidFor(aBid);
+            //question 2
+            boolean successful = selectedLot.bidFor(new Bid(bidder, value));
             if(successful) {
                 System.out.println("The bid for lot number " +
                                    lotNumber + " was successful.");
@@ -70,7 +71,7 @@ public class Auction
             }
         }
     }
-
+    // question 5: the original code will produce an internal method because of index mismatch
     /**
      * Return the lot with the given number. Return null if a lot with this 
      * number does not exist.
@@ -80,25 +81,86 @@ public class Auction
     public Lot getLot(int lotNumber)
     {
         if((lotNumber >= 1) && (lotNumber < nextLotNumber)) {
-            // The number seems to be reasonable.
-            Lot selectedLot = listOfLots.get(lotNumber - 1);
-            // Include a confidence check to be sure we have the
-            // right lot.
-            if(selectedLot.getNumber() != lotNumber) {
-                System.out.println("Internal error: Lot number " +
-                                   selectedLot.getNumber() +
-                                   " was returned instead of " +
-                                   lotNumber);
-                // Don't return an invalid lot.
-                selectedLot = null;
+            //question 6
+            for (Lot aLot : listOfLots){
+                if (aLot.getNumber() == lotNumber){
+                    return aLot;
+                }
             }
-            return selectedLot;
+            System.out.println("Lot number: " + lotNumber +
+                               " seem to have been removed.");
+            
+            return null;
         }
         else {
             System.out.println("Lot number: " + lotNumber +
                                " does not exist.");
             return null;
         }
+    }
+    
+    // question 3
+    public void close(){
+        //question 3
+        for (Lot aLot : listOfLots){
+            Bid highestBid = aLot.getHighestBid();
+            if (highestBid == null){
+                System.out.println ("There were no bids for the lot");
+            }else {
+                System.out.println ("The highest bid was " + highestBid.getValue());
+                System.out.println ("The bidder was " + highestBid.getBidder());
+            }
+        }
+    }
+    
+    public ArrayList<Lot> getUnsold(){ 
+        //question 4
+        ArrayList<Lot> unsoldList = new ArrayList<>();
+        for (Lot aLot : listOfLots){
+            Bid highestBid = aLot.getHighestBid();
+            if (highestBid == null){
+                unsoldList.add(aLot);
+                System.out.println(unsoldList);
+            }     
+            
+        }
+        return unsoldList;
+    }
+    
+    public ArrayList<Lot> getUnsoldIterator(){ 
+        //question 4
+        ArrayList<Lot> unsoldList = new ArrayList<>();
+        Iterator<Lot> it = listOfLots.iterator();
+        while (it.hasNext()){
+            Lot aLot = it.next();
+            Bid highestBid = aLot.getHighestBid();
+            if (highestBid == null){
+                unsoldList.add(aLot);
+                System.out.println(unsoldList);
+            }     
+            
+        }
+        return unsoldList;
+    }
+    
+    //question 7
+    public Lot removeLot(int number){
+        boolean match = false;
+        Iterator<Lot> it = listOfLots.iterator();
+        Lot lot = null;
+        while (it.hasNext() && match == false){
+            lot = it.next();
+            if (lot.getNumber() == number){
+                it.remove();
+                match = true;
+                System.out.println(number + " has been removed.");
+            }
+        }
+        if (match == false){
+            System.out.println("Lot number: " + number + " does not exist.");
+            lot = null;
+        }
+        return lot;
     }
 }
 
